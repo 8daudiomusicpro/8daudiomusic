@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reset Password - 8D Audio Music Production</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" type="image/png" href="https://8daudiomusicpro.github.io/8daudiomusicpr/logo.png.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #fafafa;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .box {
+            width: 350px;
+            background: #fff;
+            padding: 30px;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .box h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .input-box {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .input-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+            outline: none;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #0078e6;
+        }
+        .back a {
+            display: block;
+            margin-top: 10px;
+            color: #0095f6;
+            text-decoration: none;
+        }
+        .error-msg {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box">
+            <h2>Reset Password</h2>
+            <div class="input-box">
+                <input type="email" id="user-email" placeholder="Enter your email" required>
+            </div>
+            <div class="input-box">
+                <input type="password" id="new-password" placeholder="Enter new password" required>
+            </div>
+            <button class="btn" id="update-password-btn">Update Password</button>
+            <p class="back"><a href="https://8daudiomusicpro.github.io/8daudiomusicproduction/">Back to Login</a></p>
+            <p id="reset-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCL5UmHfiSao6e3HdoZwVv-fUCOpe7fp58",
+            authDomain: "login-96909.firebaseapp.com",
+            projectId: "login-96909",
+            storageBucket: "login-96909.appspot.com",
+            messagingSenderId: "1041589784359",
+            appId: "1:1041589784359:web:a213e9d92307d5b831a302"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        
+        function getOobCodeFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('oobCode');
+        }
+        
+        document.getElementById('update-password-btn').addEventListener('click', () => {
+            const email = document.getElementById('user-email').value;
+            const newPassword = document.getElementById('new-password').value;
+            const errorMsg = document.getElementById('reset-error');
+            const oobCode = getOobCodeFromUrl();
+            
+            if (!email) {
+                errorMsg.innerText = "⚠️ Please enter your email.";
+                return;
+            }
+            
+            if (!newPassword) {
+                errorMsg.innerText = "⚠️ Please enter a new password.";
+                return;
+            }
+            
+            confirmPasswordReset(auth, oobCode, newPassword)
+                .then(() => {
+                    alert("✅ Password successfully updated! You can now log in.");
+                    window.location.href = "index.html";
+                })
+                .catch(error => {
+                    errorMsg.innerText = "❌ Error: " + error.message;
+                });
+        });
+    </script>
+</body>
+</html>
