@@ -84,18 +84,19 @@
             <div class="input-box">
                 <input type="email" id="user-email" placeholder="Enter your email" required>
             </div>
-            <div class="input-box">
+            <button class="btn" id="send-reset-link">Send Reset Link</button>
+            <div class="input-box" id="password-box" style="display: none;">
                 <input type="password" id="new-password" placeholder="Enter new password" required>
             </div>
-            <button class="btn" id="update-password-btn">Update Password</button>
-            <p class="back"><a href="https://8daudiomusicpro.github.io/8daudiomusicproduction/">Back to Login</a></p>
+            <button class="btn" id="update-password-btn" style="display: none;">Update Password</button>
+            <p class="back"><a href="index.html">Back to Login</a></p>
             <p id="reset-error" class="error-msg"></p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-        import { getAuth, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+        import { getAuth, sendPasswordResetEmail, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyCL5UmHfiSao6e3HdoZwVv-fUCOpe7fp58",
@@ -108,22 +109,41 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth();
-        
-        function getOobCodeFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('oobCode');
-        }
-        
-        document.getElementById('update-password-btn').addEventListener('click', () => {
+
+        document.getElementById('send-reset-link').addEventListener('click', () => {
             const email = document.getElementById('user-email').value;
-            const newPassword = document.getElementById('new-password').value;
             const errorMsg = document.getElementById('reset-error');
-            const oobCode = getOobCodeFromUrl();
             
             if (!email) {
                 errorMsg.innerText = "⚠️ Please enter your email.";
                 return;
             }
+
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    alert("✅ Password reset link sent! Check your email.");
+                })
+                .catch(error => {
+                    errorMsg.innerText = "❌ Error: " + error.message;
+                });
+        });
+
+        function getOobCodeFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('oobCode');
+        }
+
+        const oobCode = getOobCodeFromUrl();
+        if (oobCode) {
+            document.getElementById('password-box').style.display = 'block';
+            document.getElementById('update-password-btn').style.display = 'block';
+            document.getElementById('send-reset-link').style.display = 'none';
+            document.getElementById('user-email').style.display = 'none';
+        }
+
+        document.getElementById('update-password-btn').addEventListener('click', () => {
+            const newPassword = document.getElementById('new-password').value;
+            const errorMsg = document.getElementById('reset-error');
             
             if (!newPassword) {
                 errorMsg.innerText = "⚠️ Please enter a new password.";
@@ -142,3 +162,6 @@
     </script>
 </body>
 </html>
+
+
+       
